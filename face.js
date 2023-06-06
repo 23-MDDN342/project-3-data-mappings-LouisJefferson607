@@ -30,12 +30,12 @@ function segment_average(segment) {
 
 // This where you define your own face object
 function Face(eye_value, mouth_value, chocolate_value, NS, chocolate_size) {
-  this.eye_value = 5;
-  this.mouth_value = 75
+  this.eye_value = 1;
+  this.mouth_value = 20
   this.chocolate_value = 7
   this.height_cook = 20
   this.width_cook = 20
-  this.chocolate_size = 1
+  this.chocolate_size = 0.2
 
   /*
    * Draw the face with position lists that include:
@@ -44,9 +44,15 @@ function Face(eye_value, mouth_value, chocolate_value, NS, chocolate_size) {
    */  
   this.draw = function(positions) {
 
+    this.averageRightEye = segment_average(positions.right_eye)
+    this.averageLeftEye = segment_average(positions.left_eye)
 
-  push()
-  scale(0.3)
+    this.centreX = positions.nose_bridge[0][0]
+    this.centreY = positions.nose_bridge[0][1]
+
+  
+  
+  
 
 
     let cookie_colors = [
@@ -83,41 +89,26 @@ function Face(eye_value, mouth_value, chocolate_value, NS, chocolate_size) {
     }
   //Gets random noise seed so that all cookies are drawn differently
   //Draws cookies shadow using Perlin noise
-  noiseSeed(NS)
-    angleMode(RADIANS)
-  noStroke()
-    let shadow_offset = 1;
-    let shadow_color = color(0, 0, 0, 200);
-    push();
-    translate(shadow_offset, shadow_offset);
-    fill(shadow_color);
-    beginShape();
-    let noiseMax = 0.5; // set maximum noise value to 0.5
-    for (let angle = 0; angle <= 360; angle += 10) {
-      let xOff = map(cos(radians(angle)), -1, 1, 0, noiseMax);
-      let yOff = map(sin(radians(angle)), -1, 1, 0, noiseMax);
-      let noiseVal = noise(xOff * 2, yOff * 2); // multiply xOff and yOff by 2 for a smaller noise size
-      let radius = 5 + (noiseVal * 5); // set radius range to 5-10 for a smaller cookie size
-      let x = radius * cos(radians(angle));
-      let y = radius * sin(radians(angle));
-      curveVertex(x, y);
-    }
-    endShape(CLOSE);
-    //Draws cookies using Perlin noise
-    pop();
-    beginShape();
-    stroke(1);
-    noiseMax = 0.5; // set maximum noise value to 0.5
-    for (let angle = 0; angle <= 360; angle += 10) {
-      let xOff = map(cos(radians(angle)), -1, 1, 0, noiseMax);
-      let yOff = map(sin(radians(angle)), -1, 1, 0, noiseMax);
-      let noiseVal = noise(xOff*2, yOff*2); // multiply xOff and yOff by 2 for a smaller noise size
-      let radius = 5 + (noiseVal * 5); // set radius range to 5-10 for a smaller cookie size
-      let x = radius * cos(radians(angle));
-      let y = radius * sin(radians(angle));
-      curveVertex(x, y);
-    }
-    endShape(CLOSE);
+noiseSeed(NS);
+noStroke();
+let shadow_offset = 1;
+let shadow_color = color(0, 0, 0, 200);
+push();
+pop();
+beginShape();
+stroke(1);
+noiseMax = 0.5; // set maximum noise value to 0.5
+for (let angle = 0; angle <= 360; angle += 10) {
+  let xOff = map(cos(angle), -1, 1, 0, noiseMax);
+  let yOff = map(sin(angle), -1, 1, 0, noiseMax);
+  let noiseVal = noise(xOff * 2, yOff * 2); // multiply xOff and yOff by 2 for a smaller noise size
+  let radius = 1.4 + (noiseVal * 1.4); // set radius range to 5-10 for a smaller cookie size
+  let x = radius * cos(angle);
+  let y = radius * sin(angle);
+  curveVertex(x, y);
+}
+endShape(CLOSE);
+
 
     
     // If cookie is brown color , choc chip cookies are white. Otherise they are breown
@@ -138,15 +129,15 @@ function Face(eye_value, mouth_value, chocolate_value, NS, chocolate_size) {
      // draw eyes
      stroke(1);
      fill(255);
-     ellipse(-3, -2, this.eye_value, this.eye_value);
-     ellipse(3, -2, this.eye_value, this.eye_value);
+     ellipse(this.averageRightEye[0], this.averageRightEye[1],this.eye_value);
+     ellipse(this.averageLeftEye[0], this.averageLeftEye[1], this.eye_value);
      
      // draw black pupils in the eyes
      fill(0);
      let pupil_size = this.eye_value * 0.5; // size of the pupil
      let pupil_offset = this.eye_value * 0.2; // offset of the pupil from the center of the eye
-     ellipse(-3, -2, pupil_size, pupil_size);
-     ellipse(3, -2, pupil_size, pupil_size);
+     ellipse(this.averageRightEye[0], this.averageRightEye[1], pupil_size, pupil_size);
+     ellipse(this.averageLeftEye[0], this.averageLeftEye[1], pupil_size, pupil_size);
      
      // draw two small white circles inside each pupil relative to eyes
      fill(255);
@@ -154,17 +145,41 @@ function Face(eye_value, mouth_value, chocolate_value, NS, chocolate_size) {
      let small_circle2_size = pupil_size * 0.3;
      let small_circle1_offset = pupil_size * 0.2;
      let small_circle2_offset = pupil_size * 0.1;
-     ellipse(-3 - pupil_offset + small_circle1_offset, -2 - small_circle1_offset, small_circle1_size, small_circle1_size);
-     ellipse(-3 - pupil_offset + small_circle2_offset, -2 + small_circle2_offset, small_circle2_size, small_circle2_size);
-     ellipse(3 + pupil_offset - small_circle1_offset, -2 - small_circle1_offset, small_circle1_size, small_circle1_size);
-     ellipse(3 + pupil_offset - small_circle2_offset, -2 + small_circle2_offset, small_circle2_size, small_circle2_size);
+     ellipse(this.averageLeftEye[0] - pupil_offset + small_circle1_offset, this.averageLeftEye[1] - small_circle1_offset, small_circle1_size, small_circle1_size);
+     ellipse(this.averageLeftEye[0] - pupil_offset + small_circle2_offset, this.averageLeftEye[1] + small_circle2_offset, small_circle2_size, small_circle2_size);
+     ellipse(this.averageRightEye[0] + pupil_offset - small_circle1_offset, this.averageRightEye[1] - small_circle1_offset, small_circle1_size, small_circle1_size);
+     ellipse(this.averageRightEye[0] + pupil_offset - small_circle2_offset, this.averageRightEye[1] + small_circle2_offset, small_circle2_size, small_circle2_size);
      
      // draw mouth
      fill(255, 100, 100);
      let mouth_height = map(this.mouth_value, 0, 100, 0, 2); // map the mouth value to a range of 0-2
      rect(-1, 2, 2, mouth_height, 1); // draw a rectangle for the mouth
 
-     pop()
+   // Draw the nose
+let noseX = segment_average(positions.nose_tip)[0] * 0.3; // adjust the horizontal position of the nose
+let noseY = segment_average(positions.nose_tip)[1] * 0.3; // adjust the vertical position of the nose
+let noseSize = this.eye_value * 0.3; // adjust the size of the nose relative to the eye value
+fill(random_cookie_color); // set the fill color of the nose
+
+// Draw the main nose shape
+beginShape();
+curveVertex(noseX, noseY - noseSize * 0.6);
+curveVertex(noseX - noseSize * 0.3, noseY - noseSize * 0.4);
+curveVertex(noseX - noseSize * 0.5, noseY + noseSize * 0.4);
+curveVertex(noseX, noseY + noseSize * 0.6);
+curveVertex(noseX + noseSize * 0.5, noseY + noseSize * 0.4);
+curveVertex(noseX + noseSize * 0.3, noseY - noseSize * 0.4);
+curveVertex(noseX, noseY - noseSize * 0.6);
+endShape(CLOSE);
+
+// Draw nostrils
+let nostrilSize = noseSize * 0.15; // adjust the size of the nostrils
+let nostrilOffset = noseSize * 0.1; // adjust the offset of the nostrils
+fill(0); // set the fill color of the nostrils
+ellipse(noseX - nostrilOffset, noseY + nostrilOffset, nostrilSize, nostrilSize); // draw left nostril
+ellipse(noseX + nostrilOffset, noseY + nostrilOffset, nostrilSize, nostrilSize); // draw right nostril
+
+
     // console.log()
     // // head
     // ellipseMode(CENTER);
@@ -254,7 +269,7 @@ function Face(eye_value, mouth_value, chocolate_value, NS, chocolate_size) {
 
   /* set internal properties based on list numbers 0-100 */
   this.setProperties = function(settings) {
-    this.eye_value = int(map(settings[0], 0, 100, 1, 10));
+    this.eye_value = int(map(settings[0], 0, 100, 1, 3));
     this.mouth_value = map(settings[1], 0, 100, 0, 150);
     this.chocolate_value = map(settings[2], 0, 100, 0, 10);
     this.chocolate_size = map(settings[3], 0, 100, 0, 2);
@@ -263,7 +278,7 @@ function Face(eye_value, mouth_value, chocolate_value, NS, chocolate_size) {
   /* get internal properties as list of numbers 0-100 */
   this.getProperties = function() {
     let settings = new Array(3);
-    settings[0] = map(this.eye_value, 1, 10, 0, 100);
+    settings[0] = map(this.eye_value, 1, 3, 0, 100);
     settings[1] = map(this.mouth_value, 0, 150, 0, 100);
     settings[2] = map(this.chocolate_value, 0, 10, 0, 100);
     settings[3] = map(this.chocolate_size, 0, 2, 0, 100);
