@@ -4,10 +4,10 @@
  */  
 
 // remove this or set to false to enable full program (load will be slower)
-var DEBUG_MODE = true;
+var DEBUG_MODE = false ;
 
 // this can be used to set the number of sliders to show
-var NUM_SLIDERS = 4;
+var NUM_SLIDERS = 5;
 
 // other variables can be in here too
 // here's some examples for colors used
@@ -46,53 +46,27 @@ function Face(eye_value, mouth_value, chocolate_value, NS, chocolate_size) {
 
     this.averageRightEye = segment_average(positions.right_eye)
     this.averageLeftEye = segment_average(positions.left_eye)
+    this.averageTipLip = segment_average(positions.top_lip)
 
     this.centreX = positions.nose_bridge[0][0]
     this.centreY = positions.nose_bridge[0][1]
-
+    this.brown = color(132, 86, 60)
+    this.lightbrown = color(217, 190, 145)
+    
+    //  fill(random_cookie_color);
   
-  
-  
-
-
-    let cookie_colors = [
-      {color: color(132, 86, 60), weight: 5},
-      {color: color(217, 190, 145), weight: 3},
-      {color: color(231, 206, 150), weight: 2},
-      {color: color(238, 224, 177), weight: 1},
-      {color: color(37, 32, 27), weight: 0.1, burnt: true},
-      {color: color(255, 255, 255), weight: 0.01, uncooked: true},
-    ];
-
-    // Calculate the total weight of all the colors
-    let total_weight = 0;
-    for (let i = 0; i < cookie_colors.length; i++) {
-      total_weight += cookie_colors[i].weight;
+    this.currentAccentColor = this.brown;
+    if(this.colorValue > 50){
+      this.currentAccentColor = this.brown;
+    }else{
+      this.currentAccentColor = this.lightbrown;
     }
 
-    // Randomly select a color based on its weight
-    let random_weight = random(0, total_weight);
-    let random_cookie_color;
-    for (let i = 0; i < cookie_colors.length; i++) {
-      random_weight -= cookie_colors[i].weight;
-      if (random_weight <= 0) {
-        random_cookie_color = cookie_colors[i].color;
-        if (cookie_colors[i].uncooked) {
-          fill(255); // uncooked color
-        } else if (cookie_colors[i].burnt) {
-          fill(37, 32, 27); // burnt color
-        } else {
-          fill(random_cookie_color); // normal color
-        }
-        break;
-      }
-    }
+  fill(this.currentAccentColor);
   //Gets random noise seed so that all cookies are drawn differently
   //Draws cookies shadow using Perlin noise
 noiseSeed(NS);
 noStroke();
-let shadow_offset = 1;
-let shadow_color = color(0, 0, 0, 200);
 push();
 pop();
 beginShape();
@@ -114,7 +88,7 @@ endShape(CLOSE);
     // If cookie is brown color , choc chip cookies are white. Otherise they are breown
     noStroke();
     ;
-    if (random_cookie_color !== cookie_colors[0].color) {
+    if (this.colorValue < 50) {
       fill(37, 32, 27); // chocolate color
     } else {
       fill(237, 230, 214); // white color for chocolate chips if the cookie is the first color in the array
@@ -122,8 +96,8 @@ endShape(CLOSE);
 
      //Draws choc chips
      for (let i = 0; i < this.chocolate_value; i++) {
-      let x = random(-5, 5);
-      let y = random(-5, 5);
+      let x = random(-1.5, 1.5);
+      let y = random(-1.5, 1.5);
       ellipse(x, y, this.chocolate_size, this.chocolate_size);
     }
      // draw eyes
@@ -153,23 +127,23 @@ endShape(CLOSE);
      // draw mouth
      fill(255, 100, 100);
      let mouth_height = map(this.mouth_value, 0, 100, 0, 2); // map the mouth value to a range of 0-2
-     rect(-1, 2, 2, mouth_height, 1); // draw a rectangle for the mouth
+     rect(this.averageTipLip[0]-0.5, this.averageTipLip[1], 1, mouth_height, 1); // draw a rectangle for the mouth
 
    // Draw the nose
-let noseX = segment_average(positions.nose_tip)[0] * 0.3; // adjust the horizontal position of the nose
-let noseY = segment_average(positions.nose_tip)[1] * 0.3; // adjust the vertical position of the nose
-let noseSize = this.eye_value * 0.3; // adjust the size of the nose relative to the eye value
-fill(random_cookie_color); // set the fill color of the nose
+let noseX = segment_average(positions.nose_tip)[0]*0.8 ; // adjust the horizontal position of the nose
+let noseY = segment_average(positions.nose_tip)[1] *0.8; // adjust the vertical position of the nose
+let noseSize = this.eye_value * 0.1; // adjust the size of the nose relative to the eye value
+fill(this.currentAccentColor); // set the fill color of the nose
 
 // Draw the main nose shape
 beginShape();
-curveVertex(noseX, noseY - noseSize * 0.6);
-curveVertex(noseX - noseSize * 0.3, noseY - noseSize * 0.4);
-curveVertex(noseX - noseSize * 0.5, noseY + noseSize * 0.4);
-curveVertex(noseX, noseY + noseSize * 0.6);
-curveVertex(noseX + noseSize * 0.5, noseY + noseSize * 0.4);
-curveVertex(noseX + noseSize * 0.3, noseY - noseSize * 0.4);
-curveVertex(noseX, noseY - noseSize * 0.6);
+curveVertex(noseX, noseY - noseSize * 1.2);
+curveVertex(noseX - noseSize * 0.6, noseY - noseSize * 0.8);
+curveVertex(noseX - noseSize, noseY + noseSize * 0.8);
+curveVertex(noseX, noseY + noseSize * 1.2);
+curveVertex(noseX + noseSize, noseY + noseSize * 0.8);
+curveVertex(noseX + noseSize * 0.6, noseY - noseSize * 0.8);
+curveVertex(noseX, noseY - noseSize * 1.2);
 endShape(CLOSE);
 
 // Draw nostrils
@@ -179,7 +153,8 @@ fill(0); // set the fill color of the nostrils
 ellipse(noseX - nostrilOffset, noseY + nostrilOffset, nostrilSize, nostrilSize); // draw left nostril
 ellipse(noseX + nostrilOffset, noseY + nostrilOffset, nostrilSize, nostrilSize); // draw right nostril
 
-
+  
+    
     // console.log()
     // // head
     // ellipseMode(CENTER);
@@ -269,19 +244,21 @@ ellipse(noseX + nostrilOffset, noseY + nostrilOffset, nostrilSize, nostrilSize);
 
   /* set internal properties based on list numbers 0-100 */
   this.setProperties = function(settings) {
-    this.eye_value = int(map(settings[0], 0, 100, 1, 3));
+    this.eye_value = map(settings[0], 0, 100, 1, 3, true);
     this.mouth_value = map(settings[1], 0, 100, 0, 150);
-    this.chocolate_value = map(settings[2], 0, 100, 0, 10);
+    this.chocolate_value = map(settings[2], 0, 100, 0, 15);
     this.chocolate_size = map(settings[3], 0, 100, 0, 2);
+    this.colorValue = map(settings[4], 0, 100, 0, 100);
   }
 
   /* get internal properties as list of numbers 0-100 */
   this.getProperties = function() {
     let settings = new Array(3);
-    settings[0] = map(this.eye_value, 1, 3, 0, 100);
+    settings[0] = map(this.eye_value, 1, 3, 0, 100,true);
     settings[1] = map(this.mouth_value, 0, 150, 0, 100);
-    settings[2] = map(this.chocolate_value, 0, 10, 0, 100);
+    settings[2] = map(this.chocolate_value, 0, 15, 0, 100);
     settings[3] = map(this.chocolate_size, 0, 2, 0, 100);
+    settings[4] = map(this.colorValue, 0, 100, 0, 100);
     return settings;
   }
 }
