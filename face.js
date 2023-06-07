@@ -115,6 +115,7 @@ endShape(CLOSE);
      
      // draw two small white circles inside each pupil relative to eyes
      fill(255);
+     noStroke();
      let small_circle1_size = pupil_size * 0.5;
      let small_circle2_size = pupil_size * 0.3;
      let small_circle1_offset = pupil_size * 0.2;
@@ -124,6 +125,7 @@ endShape(CLOSE);
      ellipse(this.averageRightEye[0] + pupil_offset - small_circle1_offset, this.averageRightEye[1] - small_circle1_offset, small_circle1_size, small_circle1_size);
      ellipse(this.averageRightEye[0] + pupil_offset - small_circle2_offset, this.averageRightEye[1] + small_circle2_offset, small_circle2_size, small_circle2_size);
      
+     stroke(1);
      // draw mouth
      fill(255, 100, 100);
      let mouth_height = map(this.mouth_value, 0, 100, 0, 2); // map the mouth value to a range of 0-2
